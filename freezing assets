@@ -5,3 +5,6 @@ mapping (address => bool) public frozenAccount;
         frozenAccount[target] = freeze;
         FrozenFunds(target, freeze);
     }
+        function transfer(address _to, uint256 _value) {
+        require(!frozenAccount[msg.sender]);
+                require(approvedAccount[msg.sender]);
