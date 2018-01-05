@@ -1,0 +1,7 @@
+mapping (address => bool) public frozenAccount;
+    event FrozenFunds(address target, bool frozen);
+
+    function freezeAccount(address target, bool freeze) onlyOwner {
+        frozenAccount[target] = freeze;
+        FrozenFunds(target, freeze);
+    }
