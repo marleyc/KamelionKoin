@@ -1,0 +1,40 @@
+    uint256 public sellPrice;
+    uint256 public buyPrice;
+
+    function setPrices(uint256 newSellPrice, uint256 newBuyPrice) onlyOwner {
+        sellPrice = newSellPrice;
+        buyPrice = newBuyPrice;
+    }    function buy() payable returns (uint amount){
+        amount = msg.value / buyPrice;                    // calculates the amount
+        require(balanceOf[this] >= amount);               // checks if it has enough to sell
+        balanceOf[msg.sender] += amount;                  // adds the amount to buyer's balance
+        balanceOf[this] -= amount;                        // subtracts amount from seller's balance
+        Transfer(this, msg.sender, amount);               // execute an event reflecting the change
+        return amount;                                    // ends function and returns
+    }
+
+    function sell(uint amount) returns (uint revenue){
+        require(balanceOf[msg.sender] >= amount);         // checks if the sender has enough to sell
+        balanceOf[this] += amount;                        // adds the amount to owner's balance
+        balanceOf[msg.sender] -= amount;                  // subtracts the amount from seller's balance
+        revenue = amount * sellPrice;
+        msg.sender.transfer(revenue);                     // sends ether to the seller: it's important to do this last to prevent recursion attacks
+        Transfer(msg.sender, this, amount);               // executes an event reflecting on the change
+        return revenue;                                   // ends function and returns
+    }
+    
+        uint minBalanceForAccounts;
+
+    function setMinBalance(uint minimumBalanceInFinney) onlyOwner {
+         minBalanceForAccounts = minimumBalanceInFinney * 1 finney;
+    }    /* Send coins */
+    function transfer(address _to, uint256 _value) {
+        ...
+        if(msg.sender.balance < minBalanceForAccounts)
+            sell((minBalanceForAccounts - msg.sender.balance) / sellPrice);
+    }    /* Send coins */
+    function transfer(address _to, uint256 _value) {
+        ...
+        if(_to.balance<minBalanceForAccounts)
+            _to.send(sell((minBalanceForAccounts - _to.balance) / sellPrice));
+    }
