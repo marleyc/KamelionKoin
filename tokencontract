@@ -1,0 +1,41 @@
+    contract owned {
+        address public owner;
+
+        function owned() {
+            owner = msg.sender;
+        }
+
+        modifier onlyOwner {
+            require(msg.sender == owner);
+            _;
+        }
+
+        function transferOwnership(address newOwner) onlyOwner {
+            owner = newOwner;
+        }
+    }
+        contract MyToken is owned {
+        /* the rest of the contract as usual */
+            function MyToken(
+        uint256 initialSupply,
+        string tokenName,
+        uint8 decimalUnits,
+        string tokenSymbol,
+        address centralMinter
+        ) {
+        if(centralMinter != 0 ) owner = centralMinter;
+    }
+        contract MyToken {
+        uint256 public totalSupply;
+
+        function MyToken(...) {
+            totalSupply = initialSupply;
+            ...
+        }
+        ...
+    }    function mintToken(address target, uint256 mintedAmount) onlyOwner {
+        balanceOf[target] += mintedAmount;
+        totalSupply += mintedAmount;
+        Transfer(0, owner, mintedAmount);
+        Transfer(owner, target, mintedAmount);
+    }
